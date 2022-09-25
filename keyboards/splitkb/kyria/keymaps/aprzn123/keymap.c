@@ -17,8 +17,10 @@
 
 enum layers {
     BASE = 0,
+    QWERTY,
     NUMS,
     NAV,
+    FNS,
     MOUSE
 };
 
@@ -68,7 +70,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [BASE] = LAYOUT(
      KC_TAB  , KC_Q ,  KC_W   ,  KC_F  ,   KC_P ,   KC_B ,                                        KC_J,   KC_L ,  KC_U ,   KC_Y ,  KC_SCLN, TG(MOUSE),
      KC_LCTL , KC_A ,  KC_R   ,  KC_S  ,   KC_T ,   KC_G ,                                        KC_M,   KC_N ,  KC_E ,   KC_I ,KC_O,KC_QUOT,
-     LCAG(KC_S) , KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_D , KC_LSFT, KC_ENT ,  KC_BSPC , KC_SPC, KC_K,   KC_H ,KC_COMM, KC_DOT ,KC_SLSH, ENC_TOG,
+     TG(QWERTY) , KC_Z ,  KC_X   ,  KC_C  ,   KC_D ,   KC_V , KC_LSFT, KC_ENT ,  KC_BSPC , KC_SPC, KC_K,   KC_H ,KC_COMM, KC_DOT ,KC_SLSH, ENC_TOG,
+                                KC_LALT , KC_LGUI, MO(NAV), KC_SPC , KC_BSPC,     KC_ENT , KC_RSFT ,MO(NUMS), KC_RGUI, KC_RALT
+    ),
+
+    [QWERTY] = LAYOUT(
+     KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T ,                                        KC_Y,   KC_U ,  KC_I ,   KC_O ,  KC_P, TG(MOUSE),
+     KC_LCTL , KC_A ,  KC_S   ,  KC_D  ,   KC_F ,   KC_G ,                                        KC_H,   KC_J ,  KC_K ,   KC_L ,KC_SCLN,KC_QUOT,
+     KC_TRNS , KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , KC_LSFT, KC_ENT ,  KC_BSPC , KC_SPC, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_SLSH, ENC_TOG,
                                 KC_LALT , KC_LGUI, MO(NAV), KC_SPC , KC_BSPC,     KC_ENT , KC_RSFT ,MO(NUMS), KC_RGUI, KC_RALT
     ),
 
@@ -83,6 +92,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        KC_ESC , _______, _______, KC_UP  , _______, _______,                                     _______, KC_HOME, KC_END , _______, _______, _______,
        _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, _______,                                     KC_LEFT, KC_DOWN, KC_UP  , KC_RGHT, KC_PGUP, KC_PGDN,
        _______, _______, KC_MPRV, KC_MPLY, KC_MNXT, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+     ),
+
+     [FNS] = LAYOUT(
+       _______, KC_F9  , KC_F10 , KC_F11 , KC_F12 , _______,                                     _______, _______, _______, _______, _______, _______,
+       _______, KC_F5  , KC_F6  , KC_F7  , KC_F8  , _______,                                     _______, _______, _______, _______, _______, _______,
+       _______, KC_F1  , KC_F2  , KC_F3  , KC_F4  , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
 
@@ -264,9 +280,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) {
         // Page up/Page down
         if (clockwise) {
-            tap_code(KC_PGDN);
-        } else {
             tap_code(KC_PGUP);
+        } else {
+            tap_code(KC_PGDN);
         }
     } else if (index == 1) {
         if (encmode_sel && !clockwise) {
@@ -327,5 +343,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(1, IS_LAYER_ON_STATE(state, NUMS));
     rgblight_set_layer_state(2, IS_LAYER_ON_STATE(state, NAV));
     rgblight_set_layer_state(3, IS_LAYER_ON_STATE(state, MOUSE));
+
+    state = update_tri_layer_state(state, NUMS, NAV, FNS);
     return state;
-}
+} 
